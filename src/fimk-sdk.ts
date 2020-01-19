@@ -35,12 +35,13 @@ import {
   ColoredCoinsBidOrderCancellation
 } from "./attachment"
 import { Fee } from "./fee"
-// import { AtomicTransfer } from "./attachment"
+import { RsAddress as _RsAddress } from "./rs-address"
 
 export const attachment = _attachment
 export const Builder = builder.Builder
 export const TransactionImpl = builder.TransactionImpl
 export const Transaction = transaction.Transaction
+export const RsAddress = _RsAddress;
 
 export interface ConfigArgs {
   isTestnet?: boolean

@@ -5,10 +5,12 @@ import * as _attachment from "./attachment";
 import * as builder from "./builder";
 import * as transaction from "./transaction";
 import { FimkApi } from "./fimk-api";
+import { RsAddress as _RsAddress } from "./rs-address";
 export declare const attachment: typeof _attachment;
 export declare const Builder: typeof builder.Builder;
 export declare const TransactionImpl: typeof builder.TransactionImpl;
 export declare const Transaction: typeof transaction.Transaction;
+export declare const RsAddress: typeof _RsAddress;
 export interface ConfigArgs {
     isTestnet?: boolean;
     baseURL?: string;
