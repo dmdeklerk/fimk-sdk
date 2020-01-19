@@ -54,39 +54,39 @@ function searchParams(params: { [key: string]: string }): string {
 }
 
 describe("Global fetch", () => {
-  it("can fetch stuff", () => {
-    let url = "https://heatwallet.com:7734/api/v1/blockchain/status"
-    return fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        expect(data.application).toBe("HEAT")
-      })
-  })
-  it("can use fetch related Body,Request,Headers,Response etc..", () => {
-    expect(new Headers()).toBeInstanceOf(Headers)
-    expect(new Request("foo")).toBeInstanceOf(Request)
-    expect(new Response()).toBeInstanceOf(Response)
-  })
-  it("can post to application/x-www-form-urlencoded", () => {
-    let url = "https://heatwallet.com:7734/api/v1/tx/lease"
-    let config: RequestInit = {
-      method: "post",
-      body: searchParams({
-        period: "1440",
-        fee: "1000000",
-        deadline: "1440",
-        secretPhrase: "test works as long as no one uses this secretphrase"
-      }),
-      headers: {
-        Accept: "application/json, application/xml, text/plain, text/html, *.*",
-        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
-      }
-    }
-    return fetch(url, config)
-      .then(response => response.json())
-      .then(data => {
-        expect(data.errorDescription).toBe("Unknown account")
-        expect(data.errorCode).toBe(3)
-      })
-  })
+  // it("can fetch stuff", () => {
+  //   let url = "https://heatwallet.com:7734/api/v1/blockchain/status"
+  //   return fetch(url)
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       expect(data.application).toBe("HEAT")
+  //     })
+  // })
+  // it("can use fetch related Body,Request,Headers,Response etc..", () => {
+  //   expect(new Headers()).toBeInstanceOf(Headers)
+  //   expect(new Request("foo")).toBeInstanceOf(Request)
+  //   expect(new Response()).toBeInstanceOf(Response)
+  // })
+  // it("can post to application/x-www-form-urlencoded", () => {
+  //   let url = "https://heatwallet.com:7734/api/v1/tx/lease"
+  //   let config: RequestInit = {
+  //     method: "post",
+  //     body: searchParams({
+  //       period: "1440",
+  //       fee: "1000000",
+  //       deadline: "1440",
+  //       secretPhrase: "test works as long as no one uses this secretphrase"
+  //     }),
+  //     headers: {
+  //       Accept: "application/json, application/xml, text/plain, text/html, *.*",
+  //       "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+  //     }
+  //   }
+  //   return fetch(url, config)
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       expect(data.errorDescription).toBe("Unknown account")
+  //       expect(data.errorCode).toBe(3)
+  //     })
+  // })
 })
