@@ -46,6 +46,8 @@ export abstract class EmptyAttachment extends appendix.AbstractAppendix implemen
     return this.getMySize()
   }
 
+  public putBytes(buffer: ByteBuffer) {}
+
   putMyBytes(buffer: ByteBuffer) {}
 
   putMyJSON(json: { [key: string]: any }) {}
@@ -84,123 +86,126 @@ export class Message extends EmptyAttachment {
 
 // ------------------- Asset ------------------------------------------------------------------------------------------
 
-export class AssetIssuance extends appendix.AbstractAppendix implements Attachment {
-  private descriptionUrl: string
-  private descriptionHash: number[]
-  private quantity: Long
-  private decimals: number
-  private dillutable: boolean
+// export class AssetIssuance extends appendix.AbstractAppendix implements Attachment {
+//   private descriptionUrl: string
+//   private descriptionHash: number[]
+//   private quantity: Long
+//   private decimals: number
+//   private dillutable: boolean
 
-  init(
-    descriptionUrl: string,
-    descriptionHash: number[],
-    quantity: string,
-    decimals: number,
-    dillutable: boolean
-  ) {
-    this.descriptionUrl = descriptionUrl
-    this.descriptionHash = descriptionHash == null ? new Array(32).fill(0) : descriptionHash
-    this.quantity = Long.fromString(quantity)
-    this.decimals = decimals
-    this.dillutable = dillutable
-    return this
-  }
+//   init(
+//     descriptionUrl: string,
+//     descriptionHash: number[],
+//     quantity: string,
+//     decimals: number,
+//     dillutable: boolean
+//   ) {
+//     this.descriptionUrl = descriptionUrl
+//     this.descriptionHash = descriptionHash == null ? new Array(32).fill(0) : descriptionHash
+//     this.quantity = Long.fromString(quantity)
+//     this.decimals = decimals
+//     this.dillutable = dillutable
+//     return this
+//   }
 
-  getMySize(): number {
-    return 1 + converters.stringToByteArray(this.descriptionUrl).length + 32 + 8 + 1 + 1
-  }
+//   getMySize(): number {
+//     return 1 + converters.stringToByteArray(this.descriptionUrl).length + 32 + 8 + 1 + 1
+//   }
 
-  public parse(buffer: ByteBuffer) {
-    super.parse(buffer)
-    this.descriptionUrl = converters.byteArrayToString(utils.readBytes(buffer, buffer.readByte())) //need to check Constants.MAX_ASSET_DESCRIPTION_URL_LENGTH ?
-    this.descriptionHash = utils.readBytes(buffer, 32)
-    this.quantity = buffer.readInt64()
-    this.decimals = buffer.readByte()
-    this.dillutable = buffer.readByte() == 1
-    return this
-  }
+//   public parse(buffer: ByteBuffer) {
+//     super.parse(buffer)
+//     this.descriptionUrl = converters.byteArrayToString(utils.readBytes(buffer, buffer.readByte())) //need to check Constants.MAX_ASSET_DESCRIPTION_URL_LENGTH ?
+//     this.descriptionHash = utils.readBytes(buffer, 32)
+//     this.quantity = buffer.readInt64()
+//     this.decimals = buffer.readByte()
+//     this.dillutable = buffer.readByte() == 1
+//     return this
+//   }
 
-  putMyBytes(buffer: ByteBuffer): void {
-    let descriptionUrl = converters.stringToByteArray(this.descriptionUrl)
-    buffer.writeByte(descriptionUrl.length)
-    utils.writeBytes(buffer, descriptionUrl)
-    if (this.descriptionHash && this.descriptionHash.length != 32)
-      throw new Error("Description hash length must be 32")
-    utils.writeBytes(buffer, this.descriptionHash)
-    buffer.writeInt64(this.quantity)
-    buffer.writeByte(this.decimals)
-    buffer.writeByte(this.dillutable ? 1 : 0)
-  }
+//   putMyBytes(buffer: ByteBuffer): void {
+//     let descriptionUrl = converters.stringToByteArray(this.descriptionUrl)
+//     buffer.writeByte(descriptionUrl.length)
+//     utils.writeBytes(buffer, descriptionUrl)
+//     if (this.descriptionHash && this.descriptionHash.length != 32)
+//       throw new Error("Description hash length must be 32")
+//     utils.writeBytes(buffer, this.descriptionHash)
+//     buffer.writeInt64(this.quantity)
+//     buffer.writeByte(this.decimals)
+//     buffer.writeByte(this.dillutable ? 1 : 0)
+//   }
 
-  public parseJSON(json: { [key: string]: any }) {
-    super.parseJSON(json)
-    this.descriptionUrl = json["descriptionUrl"]
-    this.descriptionHash = <any>converters.hexStringToByteArray(json["descriptionHash"])
-    this.quantity = Long.fromString(json["quantity"])
-    this.decimals = json["decimals"]
-    this.dillutable = json["dillutable"]
-    return this
-  }
+//   public parseJSON(json: { [key: string]: any }) {
+//     super.parseJSON(json)
+//     this.descriptionUrl = json["descriptionUrl"]
+//     this.descriptionHash = <any>converters.hexStringToByteArray(json["descriptionHash"])
+//     this.quantity = Long.fromString(json["quantity"])
+//     this.decimals = json["decimals"]
+//     this.dillutable = json["dillutable"]
+//     return this
+//   }
 
-  putMyJSON(json: { [key: string]: any }): void {
-    json["descriptionUrl"] = this.descriptionUrl
-    json["descriptionHash"] = converters.byteArrayToHexString(Array.from(this.descriptionHash))
-    json["quantity"] = this.quantity.toString()
-    json["decimals"] = this.decimals
-    json["dillutable"] = this.dillutable
-  }
+//   putMyJSON(json: { [key: string]: any }): void {
+//     json["descriptionUrl"] = this.descriptionUrl
+//     json["descriptionHash"] = converters.byteArrayToHexString(Array.from(this.descriptionHash))
+//     json["quantity"] = this.quantity.toString()
+//     json["decimals"] = this.decimals
+//     json["dillutable"] = this.dillutable
+//   }
 
-  getFee() {
-    return Fee.ASSET_ISSUANCE_FEE
-  }
+//   getFee() {
+//     return Fee.ASSET_ISSUANCE_FEE
+//   }
 
-  getAppendixName() {
-    return "AssetIssuance"
-  }
+//   getAppendixName() {
+//     return "AssetIssuance"
+//   }
 
-  getTransactionType() {
-    return transactionType.COLORED_COINS_ASSET_ISSUANCE_TRANSACTION_TYPE
-  }
+//   getTransactionType() {
+//     return transactionType.COLORED_COINS_ASSET_ISSUANCE_TRANSACTION_TYPE
+//   }
 
-  getDescriptionUrl(): string {
-    return this.descriptionUrl
-  }
+//   getDescriptionUrl(): string {
+//     return this.descriptionUrl
+//   }
 
-  getDescriptionHash(): number[] {
-    return this.descriptionHash
-  }
+//   getDescriptionHash(): number[] {
+//     return this.descriptionHash
+//   }
 
-  getQuantity(): Long {
-    return this.quantity
-  }
+//   getQuantity(): Long {
+//     return this.quantity
+//   }
 
-  getDecimals(): number {
-    return this.decimals
-  }
+//   getDecimals(): number {
+//     return this.decimals
+//   }
 
-  getDillutable(): boolean {
-    return this.dillutable
-  }
-}
+//   getDillutable(): boolean {
+//     return this.dillutable
+//   }
+// }
 
 export abstract class AssetBase extends appendix.AbstractAppendix {
   private assetId: Long
   private quantity: Long
 
   init(assetId: string, quantity: string) {
-    this.assetId = Long.fromString(assetId)
+    this.assetId = Long.fromString(assetId, true)
     this.quantity = Long.fromString(quantity)
     return this
   }
 
   getMySize(): number {
-    return 8 + 8
+    return 8 + 8 + 2
   }
 
   public parse(buffer: ByteBuffer) {
     super.parse(buffer)
     this.assetId = buffer.readInt64()
     this.quantity = buffer.readInt64()
+    const len = buffer.readShort()
+    const bytes = []
+    for (let i = 0; i < len; i++) bytes.push(buffer.readByte())
     return this
   }
 
@@ -230,19 +235,19 @@ export abstract class AssetBase extends appendix.AbstractAppendix {
   }
 }
 
-export class AssetIssueMore extends AssetBase implements Attachment {
-  getFee() {
-    return Fee.ASSET_ISSUE_MORE_FEE
-  }
+// export class AssetIssueMore extends AssetBase implements Attachment {
+//   getFee() {
+//     return Fee.ASSET_ISSUE_MORE_FEE
+//   }
 
-  getAppendixName() {
-    return "AssetIssueMore"
-  }
+//   getAppendixName() {
+//     return "AssetIssueMore"
+//   }
 
-  getTransactionType() {
-    return transactionType.COLORED_COINS_ASSET_ISSUE_MORE_TRANSACTION_TYPE
-  }
-}
+//   getTransactionType() {
+//     return transactionType.COLORED_COINS_ASSET_ISSUE_MORE_TRANSACTION_TYPE
+//   }
+// }
 
 export class AssetTransfer extends AssetBase implements Attachment {
   getFee() {
@@ -264,89 +269,89 @@ export type AtomicTransfer = {
   quantity: string
 }
 
-export class AtomicMultiTransfer extends appendix.AbstractAppendix implements Attachment {
-  private transfers: AtomicTransfer[]
+// export class AtomicMultiTransfer extends appendix.AbstractAppendix implements Attachment {
+//   private transfers: AtomicTransfer[]
 
-  init(transfers: AtomicTransfer[]) {
-    this.transfers = transfers
-    return this
-  }
+//   init(transfers: AtomicTransfer[]) {
+//     this.transfers = transfers
+//     return this
+//   }
 
-  get getTransfers(): AtomicTransfer[] {
-    return this.transfers
-  }
+//   get getTransfers(): AtomicTransfer[] {
+//     return this.transfers
+//   }
 
-  getFee() {
-    return Fee.ATOMIC_MULTI_TRANSFER_FEE
-  }
+//   getFee() {
+//     return Fee.ATOMIC_MULTI_TRANSFER_FEE
+//   }
 
-  getAppendixName() {
-    return "AtomicMultiTransfer"
-  }
+//   getAppendixName() {
+//     return "AtomicMultiTransfer"
+//   }
 
-  getTransactionType() {
-    return transactionType.COLORED_COINS_ATOMIC_MULTI_TRANSFER_TRANSACTION_TYPE
-  }
+//   getTransactionType() {
+//     return transactionType.COLORED_COINS_ATOMIC_MULTI_TRANSFER_TRANSACTION_TYPE
+//   }
 
-  getMySize(): number {
-    return 1 + this.transfers.length * (8 + 8 + 8)
-  }
+//   getMySize(): number {
+//     return 1 + this.transfers.length * (8 + 8 + 8)
+//   }
 
-  putMyBytes(buffer: ByteBuffer): void {
-    buffer.writeByte(this.transfers.length)
-    this.transfers.forEach(function(transfer) {
-      buffer.writeInt64(Long.fromString(transfer.recipient, true))
-      buffer.writeInt64(Long.fromString(transfer.assetId, true))
-      buffer.writeInt64(Long.fromString(transfer.quantity))
-    })
-  }
+//   putMyBytes(buffer: ByteBuffer): void {
+//     buffer.writeByte(this.transfers.length)
+//     this.transfers.forEach(function(transfer) {
+//       buffer.writeInt64(Long.fromString(transfer.recipient, true))
+//       buffer.writeInt64(Long.fromString(transfer.assetId, true))
+//       buffer.writeInt64(Long.fromString(transfer.quantity))
+//     })
+//   }
 
-  public parse(buffer: ByteBuffer) {
-    super.parse(buffer)
-    let count = buffer.readByte()
-    this.transfers = []
-    for (let i = 0; i < count; i++) {
-      let v: AtomicTransfer = {
-        recipient: buffer
-          .readInt64()
-          .toUnsigned()
-          .toString(),
-        assetId: buffer
-          .readInt64()
-          .toUnsigned()
-          .toString(),
-        quantity: buffer.readInt64().toString()
-      }
-      this.transfers.push(v)
-    }
-    return this
-  }
+//   public parse(buffer: ByteBuffer) {
+//     super.parse(buffer)
+//     let count = buffer.readByte()
+//     this.transfers = []
+//     for (let i = 0; i < count; i++) {
+//       let v: AtomicTransfer = {
+//         recipient: buffer
+//           .readInt64()
+//           .toUnsigned()
+//           .toString(),
+//         assetId: buffer
+//           .readInt64()
+//           .toUnsigned()
+//           .toString(),
+//         quantity: buffer.readInt64().toString()
+//       }
+//       this.transfers.push(v)
+//     }
+//     return this
+//   }
 
-  putMyJSON(json: { [key: string]: any }): void {
-    let ts = []
-    this.transfers.forEach(function(transfer) {
-      ts.push({
-        recipient: transfer.recipient,
-        assetId: transfer.assetId,
-        quantity: transfer.quantity
-      })
-    })
-    json["transfers"] = ts
-  }
+//   putMyJSON(json: { [key: string]: any }): void {
+//     let ts = []
+//     this.transfers.forEach(function(transfer) {
+//       ts.push({
+//         recipient: transfer.recipient,
+//         assetId: transfer.assetId,
+//         quantity: transfer.quantity
+//       })
+//     })
+//     json["transfers"] = ts
+//   }
 
-  parseJSON(json: { [key: string]: any }) {
-    this.transfers = []
-    let ts = json["transfers"]
-    for (let i in ts) {
-      this.transfers.push({
-        recipient: ts[i].recipient,
-        assetId: ts[i].assetId,
-        quantity: ts[i].quantity
-      })
-    }
-    return this
-  }
-}
+//   parseJSON(json: { [key: string]: any }) {
+//     this.transfers = []
+//     let ts = json["transfers"]
+//     for (let i in ts) {
+//       this.transfers.push({
+//         recipient: ts[i].recipient,
+//         assetId: ts[i].assetId,
+//         quantity: ts[i].quantity
+//       })
+//     }
+//     return this
+//   }
+// }
 
 // ------------------- Colored coins. Orders ----------------------------------------------------------------------------
 
@@ -518,194 +523,194 @@ export class ColoredCoinsBidOrderCancellation extends ColoredCoinsOrderCancellat
 
 // ------------------- Colored coins. Whitelist ------------------------------------------------------------------------
 
-export class ColoredCoinsWhitelistAccountAddition extends appendix.AbstractAppendix
-  implements Attachment {
-  private assetId: Long
-  private accountId: Long
-  private endHeight: number
+// export class ColoredCoinsWhitelistAccountAddition extends appendix.AbstractAppendix
+//   implements Attachment {
+//   private assetId: Long
+//   private accountId: Long
+//   private endHeight: number
 
-  init(assetId: string, accountId: string, endHeight: number) {
-    this.assetId = Long.fromString(assetId)
-    this.accountId = Long.fromString(accountId)
-    this.endHeight = endHeight
-    return this
-  }
+//   init(assetId: string, accountId: string, endHeight: number) {
+//     this.assetId = Long.fromString(assetId)
+//     this.accountId = Long.fromString(accountId)
+//     this.endHeight = endHeight
+//     return this
+//   }
 
-  getMySize(): number {
-    return 8 + 8 + 4
-  }
+//   getMySize(): number {
+//     return 8 + 8 + 4
+//   }
 
-  public parse(buffer: ByteBuffer) {
-    super.parse(buffer)
-    this.assetId = buffer.readInt64()
-    this.accountId = buffer.readInt64()
-    this.endHeight = buffer.readInt32()
-    return this
-  }
+//   public parse(buffer: ByteBuffer) {
+//     super.parse(buffer)
+//     this.assetId = buffer.readInt64()
+//     this.accountId = buffer.readInt64()
+//     this.endHeight = buffer.readInt32()
+//     return this
+//   }
 
-  putMyBytes(buffer: ByteBuffer): void {
-    buffer.writeInt64(this.assetId)
-    buffer.writeInt64(this.accountId)
-    buffer.writeInt32(this.endHeight)
-  }
+//   putMyBytes(buffer: ByteBuffer): void {
+//     buffer.writeInt64(this.assetId)
+//     buffer.writeInt64(this.accountId)
+//     buffer.writeInt32(this.endHeight)
+//   }
 
-  parseJSON(json: { [key: string]: any }) {
-    super.parseJSON(json)
-    this.assetId = Long.fromString(json["asset"], true)
-    this.accountId = Long.fromString(json["account"], true)
-    this.endHeight = json["endHeight"]
-    return this
-  }
+//   parseJSON(json: { [key: string]: any }) {
+//     super.parseJSON(json)
+//     this.assetId = Long.fromString(json["asset"], true)
+//     this.accountId = Long.fromString(json["account"], true)
+//     this.endHeight = json["endHeight"]
+//     return this
+//   }
 
-  putMyJSON(json: { [key: string]: any }): void {
-    json["asset"] = this.assetId.toUnsigned().toString()
-    json["account"] = this.accountId.toUnsigned().toString()
-    json["endHeight"] = this.endHeight
-  }
+//   putMyJSON(json: { [key: string]: any }): void {
+//     json["asset"] = this.assetId.toUnsigned().toString()
+//     json["account"] = this.accountId.toUnsigned().toString()
+//     json["endHeight"] = this.endHeight
+//   }
 
-  getAppendixName() {
-    return "WhitelistAccountAddition"
-  }
+//   getAppendixName() {
+//     return "WhitelistAccountAddition"
+//   }
 
-  getTransactionType() {
-    return transactionType.WHITELIST_ACCOUNT_ADDITION_TRANSACTION_TYPE
-  }
+//   getTransactionType() {
+//     return transactionType.WHITELIST_ACCOUNT_ADDITION_TRANSACTION_TYPE
+//   }
 
-  getFee() {
-    return Fee.WHITELIST_ACCOUNT_FEE
-  }
+//   getFee() {
+//     return Fee.WHITELIST_ACCOUNT_FEE
+//   }
 
-  getAssetId(): Long {
-    return this.assetId
-  }
+//   getAssetId(): Long {
+//     return this.assetId
+//   }
 
-  getAccountId(): Long {
-    return this.accountId
-  }
+//   getAccountId(): Long {
+//     return this.accountId
+//   }
 
-  getEndHeight(): number {
-    return this.endHeight
-  }
-}
+//   getEndHeight(): number {
+//     return this.endHeight
+//   }
+// }
 
-export class ColoredCoinsWhitelistAccountRemoval extends appendix.AbstractAppendix
-  implements Attachment {
-  private assetId: Long
-  private accountId: Long
+// export class ColoredCoinsWhitelistAccountRemoval extends appendix.AbstractAppendix
+//   implements Attachment {
+//   private assetId: Long
+//   private accountId: Long
 
-  init(assetId: string, accountId: string) {
-    this.assetId = Long.fromString(assetId)
-    this.accountId = Long.fromString(accountId)
-    return this
-  }
+//   init(assetId: string, accountId: string) {
+//     this.assetId = Long.fromString(assetId)
+//     this.accountId = Long.fromString(accountId)
+//     return this
+//   }
 
-  getMySize(): number {
-    return 8 + 8
-  }
+//   getMySize(): number {
+//     return 8 + 8
+//   }
 
-  public parse(buffer: ByteBuffer) {
-    super.parse(buffer)
-    this.assetId = buffer.readInt64()
-    this.accountId = buffer.readInt64()
-    return this
-  }
+//   public parse(buffer: ByteBuffer) {
+//     super.parse(buffer)
+//     this.assetId = buffer.readInt64()
+//     this.accountId = buffer.readInt64()
+//     return this
+//   }
 
-  putMyBytes(buffer: ByteBuffer): void {
-    buffer.writeInt64(this.assetId)
-    buffer.writeInt64(this.accountId)
-  }
+//   putMyBytes(buffer: ByteBuffer): void {
+//     buffer.writeInt64(this.assetId)
+//     buffer.writeInt64(this.accountId)
+//   }
 
-  parseJSON(json: { [key: string]: any }) {
-    super.parseJSON(json)
-    this.assetId = Long.fromString(json["asset"], true)
-    this.accountId = Long.fromString(json["account"], true)
-    return this
-  }
+//   parseJSON(json: { [key: string]: any }) {
+//     super.parseJSON(json)
+//     this.assetId = Long.fromString(json["asset"], true)
+//     this.accountId = Long.fromString(json["account"], true)
+//     return this
+//   }
 
-  putMyJSON(json: { [key: string]: any }): void {
-    json["asset"] = this.assetId.toUnsigned().toString()
-    json["account"] = this.accountId.toUnsigned().toString()
-  }
+//   putMyJSON(json: { [key: string]: any }): void {
+//     json["asset"] = this.assetId.toUnsigned().toString()
+//     json["account"] = this.accountId.toUnsigned().toString()
+//   }
 
-  getAppendixName() {
-    return "WhitelistAccountRemoval"
-  }
+//   getAppendixName() {
+//     return "WhitelistAccountRemoval"
+//   }
 
-  getTransactionType() {
-    return transactionType.WHITELIST_ACCOUNT_REMOVAL_TRANSACTION_TYPE
-  }
+//   getTransactionType() {
+//     return transactionType.WHITELIST_ACCOUNT_REMOVAL_TRANSACTION_TYPE
+//   }
 
-  getFee() {
-    return Fee.WHITELIST_ACCOUNT_FEE
-  }
+//   getFee() {
+//     return Fee.WHITELIST_ACCOUNT_FEE
+//   }
 
-  getAssetId(): Long {
-    return this.assetId
-  }
+//   getAssetId(): Long {
+//     return this.assetId
+//   }
 
-  getAccountId(): Long {
-    return this.accountId
-  }
-}
+//   getAccountId(): Long {
+//     return this.accountId
+//   }
+// }
 
-export class ColoredCoinsWhitelistMarket extends appendix.AbstractAppendix implements Attachment {
-  private currencyId: Long
-  private assetId: Long
+// export class ColoredCoinsWhitelistMarket extends appendix.AbstractAppendix implements Attachment {
+//   private currencyId: Long
+//   private assetId: Long
 
-  init(currencyId: string, assetId: string) {
-    this.currencyId = Long.fromString(currencyId)
-    this.assetId = Long.fromString(assetId)
-    return this
-  }
+//   init(currencyId: string, assetId: string) {
+//     this.currencyId = Long.fromString(currencyId)
+//     this.assetId = Long.fromString(assetId)
+//     return this
+//   }
 
-  getMySize(): number {
-    return 8 + 8
-  }
+//   getMySize(): number {
+//     return 8 + 8
+//   }
 
-  public parse(buffer: ByteBuffer) {
-    super.parse(buffer)
-    this.currencyId = buffer.readInt64()
-    this.assetId = buffer.readInt64()
-    return this
-  }
+//   public parse(buffer: ByteBuffer) {
+//     super.parse(buffer)
+//     this.currencyId = buffer.readInt64()
+//     this.assetId = buffer.readInt64()
+//     return this
+//   }
 
-  putMyBytes(buffer: ByteBuffer): void {
-    buffer.writeInt64(this.currencyId)
-    buffer.writeInt64(this.assetId)
-  }
+//   putMyBytes(buffer: ByteBuffer): void {
+//     buffer.writeInt64(this.currencyId)
+//     buffer.writeInt64(this.assetId)
+//   }
 
-  parseJSON(json: { [key: string]: any }) {
-    super.parseJSON(json)
-    this.currencyId = Long.fromString(json["currency"], true)
-    this.assetId = Long.fromString(json["asset"], true)
-    return this
-  }
+//   parseJSON(json: { [key: string]: any }) {
+//     super.parseJSON(json)
+//     this.currencyId = Long.fromString(json["currency"], true)
+//     this.assetId = Long.fromString(json["asset"], true)
+//     return this
+//   }
 
-  putMyJSON(json: { [key: string]: any }): void {
-    json["currency"] = this.currencyId.toUnsigned().toString()
-    json["asset"] = this.assetId.toUnsigned().toString()
-  }
+//   putMyJSON(json: { [key: string]: any }): void {
+//     json["currency"] = this.currencyId.toUnsigned().toString()
+//     json["asset"] = this.assetId.toUnsigned().toString()
+//   }
 
-  getAppendixName() {
-    return "WhitelistMarket"
-  }
+//   getAppendixName() {
+//     return "WhitelistMarket"
+//   }
 
-  getTransactionType() {
-    return transactionType.WHITELIST_MARKET_TRANSACTION_TYPE
-  }
+//   getTransactionType() {
+//     return transactionType.WHITELIST_MARKET_TRANSACTION_TYPE
+//   }
 
-  getFee() {
-    return Fee.WHITELIST_MARKET_FEE
-  }
+//   getFee() {
+//     return Fee.WHITELIST_MARKET_FEE
+//   }
 
-  getAssetId(): Long {
-    return this.assetId
-  }
+//   getAssetId(): Long {
+//     return this.assetId
+//   }
 
-  getCurrencyId(): Long {
-    return this.currencyId
-  }
-}
+//   getCurrencyId(): Long {
+//     return this.currencyId
+//   }
+// }
 
 // ------------------- AccountControlEffectiveBalanceLeasing -----------------------------------------------------------
 

@@ -27,21 +27,30 @@ export abstract class TransactionType {
   public static TYPE_PAYMENT = 0
   public static TYPE_MESSAGING = 1
   public static TYPE_COLORED_COINS = 2
+  public static TYPE_DIGITAL_GOODS = 3
   public static TYPE_ACCOUNT_CONTROL = 4
   public static SUBTYPE_PAYMENT_ORDINARY_PAYMENT = 0
   public static SUBTYPE_MESSAGING_ARBITRARY_MESSAGE = 0
-  public static SUBTYPE_COLORED_COINS_ASSET_ISSUANCE = 0
-  public static SUBTYPE_COLORED_COINS_ASSET_ISSUE_MORE = 1
-  public static SUBTYPE_COLORED_COINS_ASSET_TRANSFER = 2
-  public static SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT = 3
-  public static SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT = 4
-  public static SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION = 5
-  public static SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION = 6
-  public static SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_ADDITION = 7
-  public static SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_REMOVAL = 8
-  public static SUBTYPE_COLORED_COINS_WHITELIST_MARKET = 9
-  public static SUBTYPE_COLORED_COINS_ATOMIC_MULTI_TRANSFER = 10
+  //public static SUBTYPE_COLORED_COINS_ASSET_ISSUANCE = 0
+  //public static SUBTYPE_COLORED_COINS_ASSET_ISSUE_MORE = 1
+  public static SUBTYPE_COLORED_COINS_ASSET_TRANSFER = 1
+  public static SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT = 2
+  public static SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT = 3
+  public static SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION = 4
+  public static SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION = 5
+  // public static SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_ADDITION = 7
+  // public static SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_REMOVAL = 8
+  // public static SUBTYPE_COLORED_COINS_WHITELIST_MARKET = 9
+  // public static SUBTYPE_COLORED_COINS_ATOMIC_MULTI_TRANSFER = 10
   public static SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING = 0
+  // public static SUBTYPE_DIGITAL_GOODS_LISTING = 0;
+  // public static SUBTYPE_DIGITAL_GOODS_DELISTING = 1;
+  // public static SUBTYPE_DIGITAL_GOODS_PRICE_CHANGE = 2;
+  // public static SUBTYPE_DIGITAL_GOODS_QUANTITY_CHANGE = 3;
+  public static SUBTYPE_DIGITAL_GOODS_PURCHASE = 4
+  // public static SUBTYPE_DIGITAL_GOODS_DELIVERY = 5;
+  // public static SUBTYPE_DIGITAL_GOODS_FEEDBACK = 6;
+  // public static byte SUBTYPE_DIGITAL_GOODS_REFUND = 7;
 
   abstract getType(): number
   abstract getSubtype(): number
@@ -59,14 +68,14 @@ export abstract class TransactionType {
         return ARBITRARY_MESSAGE_TRANSACTION_TYPE
       }
     } else if (type == this.TYPE_COLORED_COINS) {
-      if (subtype == this.SUBTYPE_COLORED_COINS_ASSET_ISSUANCE)
-        return COLORED_COINS_ASSET_ISSUANCE_TRANSACTION_TYPE
-      else if (subtype == this.SUBTYPE_COLORED_COINS_ASSET_ISSUE_MORE)
-        return COLORED_COINS_ASSET_ISSUE_MORE_TRANSACTION_TYPE
-      else if (subtype == this.SUBTYPE_COLORED_COINS_ASSET_TRANSFER)
+      // if (subtype == this.SUBTYPE_COLORED_COINS_ASSET_ISSUANCE)
+      //   return COLORED_COINS_ASSET_ISSUANCE_TRANSACTION_TYPE
+      // else if (subtype == this.SUBTYPE_COLORED_COINS_ASSET_ISSUE_MORE)
+      //   return COLORED_COINS_ASSET_ISSUE_MORE_TRANSACTION_TYPE
+      if (subtype == this.SUBTYPE_COLORED_COINS_ASSET_TRANSFER)
         return COLORED_COINS_ASSET_TRANSFER_TRANSACTION_TYPE
-      else if (subtype == this.SUBTYPE_COLORED_COINS_ATOMIC_MULTI_TRANSFER)
-        return COLORED_COINS_ATOMIC_MULTI_TRANSFER_TRANSACTION_TYPE
+      // else if (subtype == this.SUBTYPE_COLORED_COINS_ATOMIC_MULTI_TRANSFER)
+      //   return COLORED_COINS_ATOMIC_MULTI_TRANSFER_TRANSACTION_TYPE
       else if (subtype == this.SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT)
         return COLORED_COINS_ASK_ORDER_PLACEMENT_TRANSACTION_TYPE
       else if (subtype == this.SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT)
@@ -75,12 +84,12 @@ export abstract class TransactionType {
         return ASK_ORDER_CANCELLATION_TRANSACTION_TYPE
       else if (subtype == this.SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION)
         return BID_ORDER_CANCELLATION_TRANSACTION_TYPE
-      else if (subtype == this.SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_ADDITION)
-        return WHITELIST_ACCOUNT_ADDITION_TRANSACTION_TYPE
-      else if (subtype == this.SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_REMOVAL)
-        return WHITELIST_ACCOUNT_REMOVAL_TRANSACTION_TYPE
-      else if (subtype == this.SUBTYPE_COLORED_COINS_WHITELIST_MARKET)
-        return WHITELIST_MARKET_TRANSACTION_TYPE
+      // else if (subtype == this.SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_ADDITION)
+      //   return WHITELIST_ACCOUNT_ADDITION_TRANSACTION_TYPE
+      // else if (subtype == this.SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_REMOVAL)
+      //   return WHITELIST_ACCOUNT_REMOVAL_TRANSACTION_TYPE
+      // else if (subtype == this.SUBTYPE_COLORED_COINS_WHITELIST_MARKET)
+      //   return WHITELIST_MARKET_TRANSACTION_TYPE
     } else if (type == this.TYPE_ACCOUNT_CONTROL) {
       if (subtype == this.SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING)
         return EFFECTIVE_BALANCE_LEASING_TRANSACTION_TYPE
@@ -139,35 +148,35 @@ export abstract class ColoredCoins extends TransactionType {
   }
 }
 
-export class AssetIssuance extends ColoredCoins {
-  getSubtype() {
-    return TransactionType.SUBTYPE_COLORED_COINS_ASSET_ISSUANCE
-  }
-  parseAttachment(buffer: ByteBuffer) {
-    return new attachment.AssetIssuance().parse(buffer)
-  }
-  parseAttachmentJSON(json: { [key: string]: any }) {
-    return new attachment.AssetIssuance().parseJSON(json)
-  }
-  canHaveRecipient() {
-    return false
-  }
-}
+// export class AssetIssuance extends ColoredCoins {
+//   getSubtype() {
+//     return TransactionType.SUBTYPE_COLORED_COINS_ASSET_ISSUANCE
+//   }
+//   parseAttachment(buffer: ByteBuffer) {
+//     return new attachment.AssetIssuance().parse(buffer)
+//   }
+//   parseAttachmentJSON(json: { [key: string]: any }) {
+//     return new attachment.AssetIssuance().parseJSON(json)
+//   }
+//   canHaveRecipient() {
+//     return false
+//   }
+// }
 
-export class AssetIssueMore extends ColoredCoins {
-  getSubtype() {
-    return TransactionType.SUBTYPE_COLORED_COINS_ASSET_ISSUE_MORE
-  }
-  parseAttachment(buffer: ByteBuffer) {
-    return new attachment.AssetIssueMore().parse(buffer)
-  }
-  parseAttachmentJSON(json: { [key: string]: any }) {
-    return new attachment.AssetIssueMore().parseJSON(json)
-  }
-  canHaveRecipient() {
-    return false
-  }
-}
+// export class AssetIssueMore extends ColoredCoins {
+//   getSubtype() {
+//     return TransactionType.SUBTYPE_COLORED_COINS_ASSET_ISSUE_MORE
+//   }
+//   parseAttachment(buffer: ByteBuffer) {
+//     return new attachment.AssetIssueMore().parse(buffer)
+//   }
+//   parseAttachmentJSON(json: { [key: string]: any }) {
+//     return new attachment.AssetIssueMore().parseJSON(json)
+//   }
+//   canHaveRecipient() {
+//     return false
+//   }
+// }
 
 export class AssetTransfer extends ColoredCoins {
   getSubtype() {
@@ -184,20 +193,20 @@ export class AssetTransfer extends ColoredCoins {
   }
 }
 
-export class AtomicMultiTransfer extends ColoredCoins {
-  getSubtype() {
-    return TransactionType.SUBTYPE_COLORED_COINS_ATOMIC_MULTI_TRANSFER
-  }
-  parseAttachment(buffer: ByteBuffer) {
-    return new attachment.AtomicMultiTransfer().parse(buffer)
-  }
-  parseAttachmentJSON(json: { [key: string]: any }) {
-    return new attachment.AtomicMultiTransfer().parseJSON(json)
-  }
-  canHaveRecipient() {
-    return true
-  }
-}
+// export class AtomicMultiTransfer extends ColoredCoins {
+//   getSubtype() {
+//     return TransactionType.SUBTYPE_COLORED_COINS_ATOMIC_MULTI_TRANSFER
+//   }
+//   parseAttachment(buffer: ByteBuffer) {
+//     return new attachment.AtomicMultiTransfer().parse(buffer)
+//   }
+//   parseAttachmentJSON(json: { [key: string]: any }) {
+//     return new attachment.AtomicMultiTransfer().parseJSON(json)
+//   }
+//   canHaveRecipient() {
+//     return true
+//   }
+// }
 
 export abstract class ColoredCoinsOrderPlacement extends ColoredCoins {
   canHaveRecipient(): boolean {
@@ -265,41 +274,41 @@ export abstract class ColoredCoinsWhitelist extends ColoredCoins {
   }
 }
 
-export class WhitelistAccountAddition extends ColoredCoinsWhitelist {
-  getSubtype() {
-    return TransactionType.SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_ADDITION
-  }
-  parseAttachment(buffer: ByteBuffer) {
-    return new attachment.ColoredCoinsWhitelistAccountAddition().parse(buffer)
-  }
-  parseAttachmentJSON(json: { [key: string]: any }) {
-    return new attachment.ColoredCoinsWhitelistAccountAddition().parseJSON(json)
-  }
-}
+// export class WhitelistAccountAddition extends ColoredCoinsWhitelist {
+//   getSubtype() {
+//     return TransactionType.SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_ADDITION
+//   }
+//   parseAttachment(buffer: ByteBuffer) {
+//     return new attachment.ColoredCoinsWhitelistAccountAddition().parse(buffer)
+//   }
+//   parseAttachmentJSON(json: { [key: string]: any }) {
+//     return new attachment.ColoredCoinsWhitelistAccountAddition().parseJSON(json)
+//   }
+// }
 
-export class WhitelistAccountRemoval extends ColoredCoinsWhitelist {
-  getSubtype() {
-    return TransactionType.SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_REMOVAL
-  }
-  parseAttachment(buffer: ByteBuffer) {
-    return new attachment.ColoredCoinsWhitelistAccountRemoval().parse(buffer)
-  }
-  parseAttachmentJSON(json: { [key: string]: any }) {
-    return new attachment.ColoredCoinsWhitelistAccountRemoval().parseJSON(json)
-  }
-}
+// export class WhitelistAccountRemoval extends ColoredCoinsWhitelist {
+//   getSubtype() {
+//     return TransactionType.SUBTYPE_COLORED_COINS_WHITELIST_ACCOUNT_REMOVAL
+//   }
+//   parseAttachment(buffer: ByteBuffer) {
+//     return new attachment.ColoredCoinsWhitelistAccountRemoval().parse(buffer)
+//   }
+//   parseAttachmentJSON(json: { [key: string]: any }) {
+//     return new attachment.ColoredCoinsWhitelistAccountRemoval().parseJSON(json)
+//   }
+// }
 
-export class WhitelistMarket extends ColoredCoinsWhitelist {
-  getSubtype() {
-    return TransactionType.SUBTYPE_COLORED_COINS_WHITELIST_MARKET
-  }
-  parseAttachment(buffer: ByteBuffer) {
-    return new attachment.ColoredCoinsWhitelistMarket().parse(buffer)
-  }
-  parseAttachmentJSON(json: { [key: string]: any }) {
-    return new attachment.ColoredCoinsWhitelistMarket().parseJSON(json)
-  }
-}
+// export class WhitelistMarket extends ColoredCoinsWhitelist {
+//   getSubtype() {
+//     return TransactionType.SUBTYPE_COLORED_COINS_WHITELIST_MARKET
+//   }
+//   parseAttachment(buffer: ByteBuffer) {
+//     return new attachment.ColoredCoinsWhitelistMarket().parse(buffer)
+//   }
+//   parseAttachmentJSON(json: { [key: string]: any }) {
+//     return new attachment.ColoredCoinsWhitelistMarket().parseJSON(json)
+//   }
+// }
 
 export abstract class AccountControl extends TransactionType {
   getType(): number {
@@ -324,15 +333,15 @@ export class EffectiveBalanceLeasing extends AccountControl {
 
 export const ORDINARY_PAYMENT_TRANSACTION_TYPE = new OrdinaryPayment()
 export const ARBITRARY_MESSAGE_TRANSACTION_TYPE = new ArbitraryMessage()
-export const COLORED_COINS_ASSET_ISSUANCE_TRANSACTION_TYPE = new AssetIssuance()
-export const COLORED_COINS_ASSET_ISSUE_MORE_TRANSACTION_TYPE = new AssetIssueMore()
+// export const COLORED_COINS_ASSET_ISSUANCE_TRANSACTION_TYPE = new AssetIssuance()
+// export const COLORED_COINS_ASSET_ISSUE_MORE_TRANSACTION_TYPE = new AssetIssueMore()
 export const COLORED_COINS_ASSET_TRANSFER_TRANSACTION_TYPE = new AssetTransfer()
-export const COLORED_COINS_ATOMIC_MULTI_TRANSFER_TRANSACTION_TYPE = new AtomicMultiTransfer()
+// export const COLORED_COINS_ATOMIC_MULTI_TRANSFER_TRANSACTION_TYPE = new AtomicMultiTransfer()
 export const COLORED_COINS_ASK_ORDER_PLACEMENT_TRANSACTION_TYPE = new AskOrderPlacement()
 export const COLORED_COINS_BID_ORDER_PLACEMENT_TRANSACTION_TYPE = new BidOrderPlacement()
 export const ASK_ORDER_CANCELLATION_TRANSACTION_TYPE = new AskOrderCancellation()
 export const BID_ORDER_CANCELLATION_TRANSACTION_TYPE = new BidOrderCancellation()
-export const WHITELIST_ACCOUNT_ADDITION_TRANSACTION_TYPE = new WhitelistAccountAddition()
-export const WHITELIST_ACCOUNT_REMOVAL_TRANSACTION_TYPE = new WhitelistAccountRemoval()
-export const WHITELIST_MARKET_TRANSACTION_TYPE = new WhitelistMarket()
+// export const WHITELIST_ACCOUNT_ADDITION_TRANSACTION_TYPE = new WhitelistAccountAddition()
+// export const WHITELIST_ACCOUNT_REMOVAL_TRANSACTION_TYPE = new WhitelistAccountRemoval()
+// export const WHITELIST_MARKET_TRANSACTION_TYPE = new WhitelistMarket()
 export const EFFECTIVE_BALANCE_LEASING_TRANSACTION_TYPE = new EffectiveBalanceLeasing()

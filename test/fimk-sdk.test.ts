@@ -20,36 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * */
-import Long from "long"
-import { Buffer } from "buffer"
-import avro from "./avro-types/avro-types"
-// import a_ from './avro-types'
-// const avro:any = a_
+import "./jasmine"
+import { FimkSDK } from "../src/fimk-sdk"
 
-export const Type = {
-  forSchema(schema: any) {
-    return avro.Type.forSchema(schema, { registry: { long: longType } })
-  }
-}
-
-const longType = avro.types.LongType.__with({
-  fromBuffer: (buf: any) => {
-    return new Long(buf.readInt32LE(0), buf.readInt32LE(4))
-    //return Long.fromBits(buf.readInt32LE(0), buf.readInt32LE(4))
-  },
-  toBuffer: (n: any) => {
-    //const buf: any = Buffer.alloc(8)
-    const buf: any = new Buffer(8)
-    buf.writeInt32LE(n.getLowBits(), 0)
-    buf.writeInt32LE(n.getHighBits(), 4)
-    return buf
-  },
-  fromJSON: Long.fromValue,
-  toJSON: (n: any) => {
-    return +n
-  },
-  isValid: Long.isLong,
-  compare: (n1: any, n2: any) => {
-    return n1.compare(n2)
-  }
+describe("Export default test", () => {
+  const fimksdk = new FimkSDK()
+  it("Is exported", () => {
+    expect(fimksdk).toBeTruthy()
+  })
+  it("has a crypto property with exported methods", () => {
+    expect(fimksdk.crypto.getAccountId("secret phrase")).toBe("7567221445300685906")
+  })
 })

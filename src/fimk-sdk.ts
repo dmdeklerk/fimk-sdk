@@ -26,35 +26,25 @@ import * as utils from "./utils"
 import * as _attachment from "./attachment"
 import * as builder from "./builder"
 import * as transaction from "./transaction"
-import { HeatApi } from "./heat-api"
-import { HeatSubscriber } from "./heat-subscriber"
-import { SecretGenerator } from "./secret-generator"
+import { FimkApi } from "./fimk-api"
 import {
-  AssetIssuance,
   AssetTransfer,
   ColoredCoinsAskOrderPlacement,
   ColoredCoinsBidOrderPlacement,
   ColoredCoinsAskOrderCancellation,
-  ColoredCoinsBidOrderCancellation,
-  AtomicMultiTransfer
+  ColoredCoinsBidOrderCancellation
 } from "./attachment"
 import { Fee } from "./fee"
-import { setRandomSource } from "./random-bytes"
-import { HeatRpc } from "./heat-rpc"
-import * as types from "./types"
-import * as avro from "./avro"
-import { AtomicTransfer } from "./attachment"
+// import { AtomicTransfer } from "./attachment"
 
 export const attachment = _attachment
 export const Builder = builder.Builder
 export const TransactionImpl = builder.TransactionImpl
 export const Transaction = transaction.Transaction
-export const Type = avro.Type
 
 export interface ConfigArgs {
   isTestnet?: boolean
   baseURL?: string
-  websocketURL?: string
   genesisKey?: Array<number>
 }
 
@@ -67,17 +57,9 @@ export class Configuration {
     if (args) {
       if (utils.isDefined(args.isTestnet)) this.isTestnet = !!args.isTestnet
       if (utils.isDefined(args.baseURL)) this.baseURL = <string>args.baseURL
-      if (utils.isDefined(args.websocketURL)) this.websocketURL = <string>args.websocketURL
       if (utils.isDefined(args.genesisKey)) this.genesisKey = <Array<number>>args.genesisKey
     }
-    if (!utils.isDefined(this.baseURL))
-      this.baseURL = this.isTestnet
-        ? "https://alpha.heatledger.com:7734/api/v1"
-        : "https://heatwallet.com:7734/api/v1"
-    if (!utils.isDefined(this.websocketURL))
-      this.websocketURL = this.isTestnet
-        ? "wss://alpha.heatledger.com:7755/ws/"
-        : "wss://heatwallet.com:7755/ws/"
+    if (!utils.isDefined(this.baseURL)) this.baseURL = "https://wallet.fimk.fi:7886/nxt"
     if (!utils.isDefined(this.genesisKey)) {
       if (this.isTestnet) {
         this.genesisKey = [255, 255, 255, 255, 255, 255, 255, 127]
@@ -86,24 +68,17 @@ export class Configuration {
   }
 }
 
-export class HeatSDK {
-  public api: HeatApi
-  public subscriber: HeatSubscriber
-  public rpc: HeatRpc
-  public types = types
+export class FimkSDK {
+  public api: FimkApi
   public utils = utils
   public crypto = crypto
   public converters = converters
   public config: Configuration
-  public secretGenerator = new SecretGenerator()
-  public setRandomSource = setRandomSource
 
   constructor(config?: Configuration) {
     const config_ = config ? config : new Configuration()
     this.config = config_
-    this.api = new HeatApi({ baseURL: this.config.baseURL })
-    this.subscriber = new HeatSubscriber(this.config.websocketURL)
-    this.rpc = new HeatRpc(this.config.websocketURL)
+    this.api = new FimkApi({ baseURL: this.config.baseURL })
   }
 
   public parseTransactionBytes(transactionBytesHex: string) {
@@ -123,14 +98,29 @@ export class HeatSDK {
     return crypto.passphraseDecrypt(encrypted, passphrase)
   }
 
-  public payment(recipientOrRecipientPublicKey: string, amount: string) {
+  /**
+   * Note that the recipient must be provided in numeric form and not FIM-xx form.
+   * To get the numeric id from an RS address do:
+   *
+   *    const addr = new RsAddress('FIM')
+   *    addr.set(accountIdNumericOrRsFormat)
+   *    const numeric = addr.account_id()
+   *
+   * @param recipientOrRecipientPublicKey
+   * @param amount
+   * @param timestamp
+   */
+  public payment(recipientOrRecipientPublicKey: string, amount: string, timestamp: number) {
     return new Transaction(
       this,
       recipientOrRecipientPublicKey,
       new Builder()
-        .isTestnet(this.config.isTestnet)
-        .genesisKey(this.config.genesisKey)
         .attachment(attachment.ORDINARY_PAYMENT)
+        .feeHQT(Fee.DEFAULT)
+        .deadline(1440)
+        .ecBlockHeight(0)
+        .ecBlockId("0")
+        .timestamp(timestamp)
         .amountHQT(utils.convertToQNT(amount))
     )
   }
@@ -140,8 +130,7 @@ export class HeatSDK {
       this,
       recipientOrRecipientPublicKey,
       new Builder()
-        .isTestnet(this.config.isTestnet)
-        .genesisKey(this.config.genesisKey)
+        .feeHQT(Fee.DEFAULT)
         .attachment(attachment.ARBITRARY_MESSAGE)
         .amountHQT("0")
     ).publicMessage(message)
@@ -152,8 +141,7 @@ export class HeatSDK {
       this,
       recipientPublicKey,
       new Builder()
-        .isTestnet(this.config.isTestnet)
-        .genesisKey(this.config.genesisKey)
+        .feeHQT(Fee.DEFAULT)
         .attachment(attachment.ARBITRARY_MESSAGE)
         .amountHQT("0")
     ).privateMessage(message)
@@ -164,60 +152,52 @@ export class HeatSDK {
       this,
       null, // if null and provide private message then to send encrypted message to self
       new Builder()
-        .isTestnet(this.config.isTestnet)
-        .genesisKey(this.config.genesisKey)
+        .feeHQT(Fee.DEFAULT)
         .attachment(attachment.ARBITRARY_MESSAGE)
         .amountHQT("0")
     ).privateMessageToSelf(message)
   }
 
-  public assetIssuance(
-    descriptionUrl: string,
-    descriptionHash: number[],
-    quantity: string,
-    decimals: number,
-    dillutable: boolean,
-    feeHQT?: string
-  ) {
-    let builder = new Builder()
-      .isTestnet(this.config.isTestnet)
-      .genesisKey(this.config.genesisKey)
-      .attachment(
-        new AssetIssuance().init(descriptionUrl, descriptionHash, quantity, decimals, dillutable)
-      )
-      .amountHQT("0")
-      .feeHQT(feeHQT ? feeHQT : Fee.ASSET_ISSUANCE_FEE)
-    return new Transaction(this, "0", builder)
-  }
+  // public assetIssuance(
+  //   descriptionUrl: string,
+  //   descriptionHash: number[],
+  //   quantity: string,
+  //   decimals: number,
+  //   dillutable: boolean,
+  //   feeHQT?: string
+  // ) {
+  //   let builder = new Builder()
+  //     .isTestnet(this.config.isTestnet)
+  //     .genesisKey(this.config.genesisKey)
+  //     .attachment(
+  //       new AssetIssuance().init(descriptionUrl, descriptionHash, quantity, decimals, dillutable)
+  //     )
+  //     .amountHQT("0")
+  //     .feeHQT(feeHQT ? feeHQT : Fee.ASSET_ISSUANCE_FEE)
+  //   return new Transaction(this, "0", builder)
+  // }
 
-  public assetTransfer(
-    recipientOrRecipientPublicKey: string,
-    assetId: string,
-    quantity: string,
-    feeHQT?: string
-  ) {
+  public assetTransfer(recipientOrRecipientPublicKey: string, assetId: string, quantity: string) {
     let builder = new Builder()
-      .isTestnet(this.config.isTestnet)
-      .genesisKey(this.config.genesisKey)
+      .feeHQT(Fee.DEFAULT)
       .attachment(new AssetTransfer().init(assetId, quantity))
       .amountHQT("0")
-      .feeHQT(feeHQT ? feeHQT : Fee.ASSET_TRANSFER_FEE)
     return new Transaction(this, recipientOrRecipientPublicKey, builder)
   }
 
-  public atomicMultiTransfer(
-    recipientOrRecipientPublicKey: string,
-    transfers: AtomicTransfer[],
-    feeHQT?: string
-  ) {
-    let builder = new Builder()
-      .isTestnet(this.config.isTestnet)
-      .genesisKey(this.config.genesisKey)
-      .attachment(new AtomicMultiTransfer().init(transfers))
-      .amountHQT("0")
-      .feeHQT(feeHQT ? feeHQT : Fee.ATOMIC_MULTI_TRANSFER_FEE)
-    return new Transaction(this, recipientOrRecipientPublicKey, builder)
-  }
+  // public atomicMultiTransfer(
+  //   recipientOrRecipientPublicKey: string,
+  //   transfers: AtomicTransfer[],
+  //   feeHQT?: string
+  // ) {
+  //   let builder = new Builder()
+  //     .isTestnet(this.config.isTestnet)
+  //     .genesisKey(this.config.genesisKey)
+  //     .attachment(new AtomicMultiTransfer().init(transfers))
+  //     .amountHQT("0")
+  //     .feeHQT(feeHQT ? feeHQT : Fee.ATOMIC_MULTI_TRANSFER_FEE)
+  //   return new Transaction(this, recipientOrRecipientPublicKey, builder)
+  // }
 
   public placeAskOrder(
     currencyId: string,
@@ -227,13 +207,11 @@ export class HeatSDK {
     expiration: number
   ) {
     let builder = new Builder()
-      .isTestnet(this.config.isTestnet)
-      .genesisKey(this.config.genesisKey)
       .attachment(
         new ColoredCoinsAskOrderPlacement().init(currencyId, assetId, quantity, price, expiration)
       )
       .amountHQT("0")
-      .feeHQT("1000000")
+      .feeHQT(Fee.DEFAULT)
     return new Transaction(this, "0", builder)
   }
 
@@ -251,7 +229,7 @@ export class HeatSDK {
         new ColoredCoinsBidOrderPlacement().init(currencyId, assetId, quantity, price, expiration)
       )
       .amountHQT("0")
-      .feeHQT("1000000")
+      .feeHQT(Fee.DEFAULT)
     return new Transaction(this, "0", builder)
   }
 
@@ -261,7 +239,7 @@ export class HeatSDK {
       .genesisKey(this.config.genesisKey)
       .attachment(new ColoredCoinsAskOrderCancellation().init(orderId))
       .amountHQT("0")
-      .feeHQT("1000000")
+      .feeHQT(Fee.DEFAULT)
     return new Transaction(this, "0", builder)
   }
 
@@ -271,7 +249,7 @@ export class HeatSDK {
       .genesisKey(this.config.genesisKey)
       .attachment(new ColoredCoinsBidOrderCancellation().init(orderId))
       .amountHQT("0")
-      .feeHQT("1000000")
+      .feeHQT(Fee.DEFAULT)
     return new Transaction(this, "0", builder)
   }
 }

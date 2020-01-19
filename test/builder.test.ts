@@ -49,77 +49,15 @@ import {
 } from "../src/attachment"
 import { byteArrayToHexString, hexStringToByteArray, stringToHexString } from "../src/converters"
 import * as crypto from "../src/crypto"
-import { Configuration, HeatSDK } from "../src/heat-sdk"
+import { Configuration, FimkSDK } from "../src/fimk-sdk"
 //import Long = require("long");
 import * as Long from "long"
 
-const heatsdk = new HeatSDK(
-  new Configuration({
-    isTestnet: true
-    // baseURL: "http://localhost:7733/api/v1",
-    // websocketURL: "ws://localhost:7755/ws/"
-  })
-)
-
-function handleApiResponse(response) {
-  //console.log(response)
-  expect(response).toBeDefined()
-  expect(response.errorCode).toBeUndefined()
-}
-
-function handleCatchApiResponse(response) {
-  //console.log(response)
-  expect(response).toBeDefined()
-  expect(response.errorCode).toBeDefined()
-}
-
-function testServerParsing(txn: Transaction): Promise<any> {
-  return txn.sign("hello").then(t => {
-    let transaction = t.getTransaction()
-    let bytes = transaction.getBytesAsHex()
-    let t2 = TransactionImpl.parse(bytes)
-    //console.log(transaction.getJSONObject())
-    expect(t2).toBeInstanceOf(TransactionImpl)
-    expect(t2.getJSONObject()).toEqual(transaction.getJSONObject())
-
-    return heatsdk.api
-      .post("/tx/parse", { transactionBytes: bytes })
-      .then(response => {
-        handleApiResponse(response)
-        return response
-      })
-      .catch(response => {
-        handleCatchApiResponse(response)
-        return response
-      })
-  })
-}
-
-function checkapplicability(txn: Transaction): Promise<any> {
-  return txn.sign("user1").then(t => {
-    let transaction = t.getTransaction()
-    let bytes = transaction.getBytesAsHex()
-    let t2 = TransactionImpl.parse(bytes)
-    //console.log(transaction.getJSONObject())
-    expect(t2).toBeInstanceOf(TransactionImpl)
-    expect(t2.getJSONObject()).toEqual(transaction.getJSONObject())
-
-    return heatsdk.api
-      .post("/tx/check", { transactionBytes: bytes })
-      .then(response => {
-        handleApiResponse(response)
-        return response
-      })
-      .catch(response => {
-        handleCatchApiResponse(response)
-        return response
-      })
-  })
-}
+const fimksdk = new FimkSDK()
 
 describe("Transaction builder", () => {
   it("can create a payment", () => {
-    return heatsdk
+    return fimksdk
       .payment("12345", "100.2")
       .publicMessage("Hello world")
       .sign("secret phrase")
@@ -130,7 +68,7 @@ describe("Transaction builder", () => {
   })
 
   it("can generate transaction bytes", () => {
-    return heatsdk
+    return fimksdk
       .payment("12345", "100.2")
       .publicMessage("Hello world")
       .sign("secret phrase")
@@ -142,7 +80,7 @@ describe("Transaction builder", () => {
   })
 
   it("can generate unsigned transaction bytes", () => {
-    return heatsdk
+    return fimksdk
       .payment("12345", "100.2")
       .publicMessage("Hello world")
       .sign("secret phrase")
@@ -154,7 +92,7 @@ describe("Transaction builder", () => {
   })
 
   it("can generate json", () => {
-    return heatsdk
+    return fimksdk
       .payment("12345", "100.2")
       .publicMessage("Hello world")
       .sign("secret phrase")
@@ -195,7 +133,7 @@ describe("Transaction builder", () => {
       .recipientId("33333")
       .isTestnet(true)
       .genesisKey([255, 255, 255, 255, 255, 255, 255, 127])
-    let txn = new Transaction(heatsdk, "33333", builder)
+    let txn = new Transaction(fimksdk, "33333", builder)
     let transaction = builder.build("hello")
     txn.sign("hello")
     let unsignedBytes = transaction.getUnsignedBytes()
@@ -652,7 +590,7 @@ describe("Transaction builder", () => {
   })
 
   it("can parse transaction bytes", () => {
-    return heatsdk
+    return fimksdk
       .payment("12345", "100.2")
       .publicMessage("Hello world")
       .sign("secret phrase")
@@ -670,7 +608,7 @@ describe("Transaction builder", () => {
       .attachment(new AssetIssuance().init("https://abcd", null, "100", 0, true))
       .amountHQT("0")
       .feeHQT("50000000000")
-    testServerParsing(new Transaction(heatsdk, "0", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "0", builder)).then(response => {
       expect(response).toEqual(
         expect.objectContaining({
           fee: "50000000000",
@@ -687,7 +625,7 @@ describe("Transaction builder", () => {
       .attachment(new AssetIssueMore().init(testnet.ASSET_1.ID, "100"))
       .amountHQT("0")
       .feeHQT("50000000000")
-    testServerParsing(new Transaction(heatsdk, "123", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "123", builder)).then(response => {
       expect(response.errorDescription.indexOf("NotYetEnabledException")).toBeGreaterThanOrEqual(0)
       done()
     })
@@ -698,7 +636,7 @@ describe("Transaction builder", () => {
       .attachment(new AssetTransfer().init(testnet.ASSET_1.ID, "100"))
       .amountHQT("0")
       .feeHQT("50000000000")
-    checkapplicability(new Transaction(heatsdk, "123", builder)).then(response => {
+    checkapplicability(new Transaction(fimksdk, "123", builder)).then(response => {
       expect(response).toEqual(
         expect.objectContaining({
           fee: "50000000000",
@@ -723,7 +661,7 @@ describe("Transaction builder", () => {
       )
       .amountHQT("0")
       .feeHQT("1000000")
-    testServerParsing(new Transaction(heatsdk, "0", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "0", builder)).then(response => {
       expect(response).toEqual(
         expect.objectContaining({
           fee: "1000000",
@@ -749,7 +687,7 @@ describe("Transaction builder", () => {
       )
       .amountHQT("0")
       .feeHQT("1000000")
-    testServerParsing(new Transaction(heatsdk, "0", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "0", builder)).then(response => {
       expect(response).toEqual(
         expect.objectContaining({
           fee: "1000000",
@@ -767,7 +705,7 @@ describe("Transaction builder", () => {
       .amountHQT("0")
       .feeHQT("1000000")
     //todo make the real Ask Order and then cancel it
-    testServerParsing(new Transaction(heatsdk, "123", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "123", builder)).then(response => {
       expect(response.errorDescription).toMatch("Invalid ask order cancellation")
       done()
     })
@@ -778,7 +716,7 @@ describe("Transaction builder", () => {
       .attachment(new ColoredCoinsBidOrderCancellation().init("1234567"))
       .amountHQT("0")
       .feeHQT("1000000")
-    testServerParsing(new Transaction(heatsdk, "123", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "123", builder)).then(response => {
       expect(response.errorDescription).toMatch("Invalid bid order cancellation")
       done()
     })
@@ -795,7 +733,7 @@ describe("Transaction builder", () => {
       )
       .amountHQT("0")
       .feeHQT("1000000")
-    testServerParsing(new Transaction(heatsdk, "123", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "123", builder)).then(response => {
       expect(response.errorDescription).toMatch("NotYetEnabledException")
       done()
     })
@@ -808,7 +746,7 @@ describe("Transaction builder", () => {
       )
       .amountHQT("0")
       .feeHQT("1000000")
-    testServerParsing(new Transaction(heatsdk, "123", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "123", builder)).then(response => {
       expect(response.errorDescription).toMatch("NotYetEnabledException")
       done()
     })
@@ -819,7 +757,7 @@ describe("Transaction builder", () => {
       .attachment(new ColoredCoinsWhitelistMarket().init("0", testnet.ASSET_1.ID))
       .amountHQT("0")
       .feeHQT("1000000000")
-    testServerParsing(new Transaction(heatsdk, testnet.ASSET_1.ISSUER.ID, builder)).then(
+    testServerParsing(new Transaction(fimksdk, testnet.ASSET_1.ISSUER.ID, builder)).then(
       response => {
         expect(response.errorDescription).toMatch("Only asset issuer can allow a market")
         done()
@@ -832,7 +770,7 @@ describe("Transaction builder", () => {
       .attachment(new AccountControlEffectiveBalanceLeasing().init(2))
       .amountHQT("0")
       .feeHQT("1000000")
-    testServerParsing(new Transaction(heatsdk, "123", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "123", builder)).then(response => {
       expect(response.errorDescription).toMatch("Invalid effective balance leasing")
       done()
     })
@@ -851,7 +789,7 @@ describe("Transaction builder", () => {
         recipient: "737464"
       }
     ]
-    return heatsdk
+    return fimksdk
       .atomicMultiTransfer("12345", transfers)
       .sign("secret phrase")
       .then(t => {
@@ -881,7 +819,7 @@ describe("Transaction builder", () => {
       .attachment(new AtomicMultiTransfer().init(transfers))
       .amountHQT("0")
       .feeHQT("1000000")
-    testServerParsing(new Transaction(heatsdk, "123", builder)).then(response => {
+    testServerParsing(new Transaction(fimksdk, "123", builder)).then(response => {
       expect(response.errorDescription).toMatch("Atomic multi transfer not enabled until height")
       done()
     })

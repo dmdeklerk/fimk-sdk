@@ -25,7 +25,7 @@ import * as utils from "./utils"
 import * as appendix from "./appendix"
 import * as converters from "./converters"
 import * as crypto from "./crypto"
-import { HeatSDK } from "./heat-sdk"
+import { FimkSDK } from "./fimk-sdk"
 
 export interface IBroadcastOutput {
   /**
@@ -47,7 +47,7 @@ export class Transaction {
   private transaction_: TransactionImpl
 
   constructor(
-    private heatsdk: HeatSDK,
+    private heatsdk: FimkSDK,
     private recipientOrRecipientPublicKey: string,
     private builder: Builder
   ) {}
@@ -77,10 +77,10 @@ export class Transaction {
   private build(secretPhrase: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.builder
-        .deadline(utils.isDefined(this.deadline_) ? this.deadline_ : 1440)
-        .timestamp(utils.epochTime())
-        .ecBlockHeight(1)
-        .ecBlockId("0")
+      // .deadline(utils.isDefined(this.deadline_) ? this.deadline_ : 1440)
+      // .timestamp(utils.epochTime())
+      // .ecBlockHeight(1)
+      // .ecBlockId("0")
 
       let recipientPublicKeyHex
       if (utils.isDefined(this.privateMessageToSelf_))

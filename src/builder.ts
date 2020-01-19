@@ -269,7 +269,7 @@ export class TransactionImpl {
   }
 
   private signatureOffset() {
-    return 1 + 1 + 4 + 2 + 32 + 8 + 8 + 8
+    return 1 + 1 + 4 + 2 + 32 + 8 + 8 + 8 + 32
   }
 
   private zeroSignature(bytes: Array<number>): Array<number> {
@@ -280,6 +280,9 @@ export class TransactionImpl {
     return bytes
   }
 
+  // Differences: 2,8-48,132,145-175
+  // Diff: 128-159,164-166,168-175
+
   public getByteBuffer() {
     let size = this.getSize()
     if (this.isTestnet) size += 8
@@ -289,19 +292,21 @@ export class TransactionImpl {
     buffer.writeByte((this.version << 4) | this.type.getSubtype())
     buffer.writeInt(this.timestamp)
     buffer.writeShort(this.deadline)
-    for (let i = 0; i < this.senderPublicKey.length; i++) buffer.writeByte(this.senderPublicKey[i])
 
     let recipient = Long.fromString(
       this.type.canHaveRecipient() ? this.recipientId : "8150091319858025343",
       true
     )
     buffer.writeInt64(recipient)
+    for (let i = 0; i < this.senderPublicKey.length; i++) buffer.writeByte(this.senderPublicKey[i])
 
     let amount = Long.fromString(this.amountHQT, false)
     buffer.writeInt64(amount)
 
     let fee = Long.fromString(this.feeHQT, false)
     buffer.writeInt64(fee)
+
+    for (let i = 0; i < 32; i++) buffer.writeByte(0) // referencedTransactionFullHash
 
     for (let i = 0; i < 64; i++) buffer.writeByte(this.signature ? this.signature[i] : 0)
 
@@ -315,12 +320,12 @@ export class TransactionImpl {
       appendage.putBytes(buffer)
     })
 
-    if (this.genesisKey) {
-      // replay on main net preventer
-      this.genesisKey.forEach(byte => {
-        buffer.writeByte(byte)
-      })
-    }
+    // if (this.genesisKey) {
+    //   // replay on main net preventer
+    //   this.genesisKey.forEach(byte => {
+    //     buffer.writeByte(byte)
+    //   })
+    // }
 
     buffer.flip()
     return buffer

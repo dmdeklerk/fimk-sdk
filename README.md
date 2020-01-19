@@ -1,30 +1,30 @@
-# HEAT Nodejs / Browser libraries
+# FIMK Nodejs / Browser libraries
 
 [![Travis](https://img.shields.io/travis/Heat-Ledger-Ltd/heat-sdk.svg)](https://travis-ci.org/Heat-Ledger-Ltd/heat-sdk)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![Dev Dependencies](https://david-dm.org/Heat-Ledger-Ltd/heat-sdk/dev-status.svg)](https://david-dm.org/Heat-Ledger-Ltd/heat-sdk?type=dev)
 [![NPM version](https://img.shields.io/npm/v/heat-sdk.svg)](https://www.npmjs.com/package/heat-sdk)
 
-HEAT support libraries for Node.js and the browser
+FIMK support libraries for Node.js and the browser
 
 ### Links
 
-[**HEAT-SDK API**](https://heat-ledger-ltd.github.io/heat-sdk/) browse all classes, interfaces, methods includes links to their source code implementation.
+[**FIMK-SDK API**](https://heat-ledger-ltd.github.io/heat-sdk/) browse all classes, interfaces, methods includes links to their source code implementation.
 
-[**HEAT REST API**](https://heatwallet.com/api/#/) OpenAPI, heat server
+[**FIMK REST API**](https://heatwallet.com/api/#/) OpenAPI, heat server
 
 [**GITHUB**](https://github.com/Heat-Ledger-Ltd/heat-sdk) Heat-Ledger-Ltd/heat-sdk
 
 ### Functionality
 
-With HEAT-SDK you get full client-side/offline functionality of everything involving HEAT cryptocurrency. 
+With FIMK-SDK you get full client-side/offline functionality of everything involving FIMK cryptocurrency. 
 This includes but is not limited to:
 
-- Full HEAT API wrapper
-- Support for real-time updates through HEAT websocket API
+- Full FIMK API wrapper
+- Support for real-time updates through FIMK websocket API
 - Complete client side support for both constructing and parsing binary transaction data
 - Full client side encryption/decryption support for transaction attachments
-- Support for all other low-level HEAT functionality. But all client side, no server needed! (publickeys, accountids, transaction signatures etc.)
+- Support for all other low-level FIMK functionality. But all client side, no server needed! (publickeys, accountids, transaction signatures etc.)
 
 ### Samples
 
@@ -36,9 +36,9 @@ All samples open in https://runkit.com/ which gives you a live Nodejs environmen
 
 [![BROWSER | GENERATE ACCOUNT](https://img.shields.io/badge/BROWSER-GENERATE%20ACCOUNT-orange.svg)](https://embed.plnkr.co/ySpykW/)
 
-[![NODEJS | DEX USD to HEAT  ](https://img.shields.io/badge/NODEJS-DEX%20USD%20to%20HEAT-orange.svg)](https://runkit.com/dmdeklerk/heat-sdk-live-dex-usd-to-heat)
+[![NODEJS | DEX USD to FIMK  ](https://img.shields.io/badge/NODEJS-DEX%20USD%20to%20HEAT-orange.svg)](https://runkit.com/dmdeklerk/heat-sdk-live-dex-usd-to-heat)
 
-[![BROWSER | DEX USD to HEAT  ](https://img.shields.io/badge/BROWSER-DEX%20USD%20to%20HEAT-orange.svg)](https://embed.plnkr.co/rsVVcU/)
+[![BROWSER | DEX USD to FIMK  ](https://img.shields.io/badge/BROWSER-DEX%20USD%20to%20HEAT-orange.svg)](https://embed.plnkr.co/rsVVcU/)
 
 [![BROWSER | BLOCK WHEN?  ](https://img.shields.io/badge/BROWSER-BLOCK%20WHEN-orange.svg)](https://embed.plnkr.co/gVZVlH/)
 

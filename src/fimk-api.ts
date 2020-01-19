@@ -22,14 +22,14 @@
  * */
 import fetch from "node-fetch"
 
-export interface HeatApiConfig {
+export interface FimkApiConfig {
   baseURL: string
 }
 
-export class HeatApi {
+export class FimkApi {
   private baseURL: string
 
-  constructor(defaults: HeatApiConfig) {
+  constructor(defaults: FimkApiConfig) {
     this.baseURL = defaults.baseURL
   }
 
@@ -39,14 +39,7 @@ export class HeatApi {
         .then(response => response.json())
         .then(data => {
           if (data["errorDescription"])
-            reject(
-              new HeatApiError(
-                data["errorDescription"],
-                data["errorCode"],
-                path,
-                {}
-              )
-            )
+            reject(new FimkApiError(data["errorDescription"], data["errorCode"], path, {}))
           else resolve(data)
         })
         .catch(reason => reject(reason))
@@ -60,22 +53,14 @@ export class HeatApi {
         method: "post",
         body: this.searchParams(bodyParams),
         headers: {
-          Accept:
-            "application/json, application/xml, text/plain, text/html, *.*",
+          Accept: "application/json, application/xml, text/plain, text/html, *.*",
           "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
         }
       })
         .then(response => response.json())
         .then(data => {
           if (data["errorDescription"])
-            reject(
-              new HeatApiError(
-                data["errorDescription"],
-                data["errorCode"],
-                path,
-                params
-              )
-            )
+            reject(new FimkApiError(data["errorDescription"], data["errorCode"], path, params))
           else resolve(data)
         })
         .catch(reason => reject(reason))
@@ -87,13 +72,12 @@ export class HeatApi {
   private searchParams(params: { [key: string]: string }): string {
     let result: string[] = []
     for (var key in params)
-      if (params.hasOwnProperty(key))
-        result.push(`${key}=${encodeURIComponent(params[key])}`)
+      if (params.hasOwnProperty(key)) result.push(`${key}=${encodeURIComponent(params[key])}`)
     return result.join("&")
   }
 }
 
-export class HeatApiError {
+export class FimkApiError {
   constructor(
     public errorDescription: string,
     public errorCode: number,

@@ -21,14 +21,20 @@
  * SOFTWARE.
  * */
 import "./jasmine"
-import { HeatApiError } from "../src/heat-api"
-import { HeatSDK, Configuration } from "../src/heat-sdk"
+import { FimkApiError } from "../src/fimk-api"
+import { FimkSDK, Configuration } from "../src/fimk-sdk"
 
 describe("heat-api", () => {
-  const heatsdk = new HeatSDK()
+  const fimksdk = new FimkSDK()
   it("can GET stuff", () => {
-    return heatsdk.api.get("/blockchain/status").then((data: any) => {
-      expect(data.application).toBe("HEAT")
+    return fimksdk.api.get("?requestType=getBlockchainStatus").then((data: any) => {
+      expect(data.application).toBe("FIMK")
+    })
+  })
+  it("can GET stuff", () => {
+    return fimksdk.api.get("?requestType=getECBlock").then((data: any) => {
+      console.log(data)
+      expect(data.ecBlockId).not.toBeNull
     })
   })
   it("can POST stuff", () => {
@@ -38,9 +44,9 @@ describe("heat-api", () => {
       deadline: "1440",
       secretPhrase: "test works as long as no one uses this secretphrase"
     }
-    return heatsdk.api.post("/tx/lease", params).catch((data: HeatApiError) => {
+    return fimksdk.api.post("?requestType=leaseBalance", params).catch((data: FimkApiError) => {
       expect(data.errorDescription).toBe("Unknown account")
-      expect(data.errorCode).toBe(3)
+      expect(data.errorCode).toBe(5)
     })
   })
 })
