@@ -27,7 +27,7 @@ The tests passes until the account balance has the money.
  */
 import "./jasmine"
 import { testnet } from "./testnet"
-import { Configuration, HeatSDK } from "../src/heat-sdk"
+import { Configuration, FimkSDK } from "../src/fimk-sdk"
 import { IBroadcastOutput } from "../src/transaction"
 import * as crypto from "../src/crypto"
 
@@ -48,13 +48,13 @@ function handleResult(promise: Promise<any>, done: Function) {
 /* the tests passes until the account balance has the money */
 
 describe("Transaction API", () => {
-  const heatsdk = new HeatSDK(new Configuration({ isTestnet: true }))
+  const heatsdk = new FimkSDK(new Configuration({ isTestnet: true }))
 
   it("broadcast payment", done => {
     /* the test passes until the account balance has the money */
     let promise = heatsdk
-      .payment("4644748344150906433", "0.002")
-      .publicMessage("heat-sdk test")
+      .payment("4644748344150906433", "0.002", 0)
+      .publicMessage("fimk-sdk test")
       .sign(testnet.ACCOUNT_1.SECRET_PHRASE)
       .then(transaction => transaction.broadcast())
     handleResult(promise, done)
@@ -84,14 +84,14 @@ describe("Transaction API", () => {
     handleResult(promise, done)
   })
 
-  it("Asset Issuance", done => {
-    let promise = heatsdk
-      .assetIssuance("https://heatsdktest/assetN01", null, "1000", 0, true)
-      .publicMessage("heat-sdk test")
-      .sign(testnet.ACCOUNT_2.SECRET_PHRASE)
-      .then(transaction => transaction.broadcast())
-    handleResult(promise, done)
-  })
+  // it("Asset Issuance", done => {
+  //   let promise = heatsdk
+  //     .assetIssuance("https://heatsdktest/assetN01", null, "1000", 0, true)
+  //     .publicMessage("fimk-sdk test")
+  //     .sign(testnet.ACCOUNT_2.SECRET_PHRASE)
+  //     .then(transaction => transaction.broadcast())
+  //   handleResult(promise, done)
+  // })
 
   // it("Asset Issuance with properties", done => {
   //   let promise = heatsdk
@@ -113,14 +113,14 @@ describe("Transaction API", () => {
   it("Asset Transfer", done => {
     let promise = heatsdk
       .assetTransfer(testnet.ASSET_2.ISSUER.ID, testnet.ASSET_1.ID, "4")
-      .publicMessage("heat-sdk test")
+      .publicMessage("fimk-sdk test")
       .sign(testnet.ASSET_1.ISSUER.SECRET_PHRASE)
       .then(transaction => transaction.broadcast())
     handleResult(promise, done)
     //transfer back
     promise = heatsdk
       .assetTransfer(testnet.ASSET_1.ISSUER.ID, testnet.ASSET_1.ID, "4")
-      .publicMessage("heat-sdk test")
+      .publicMessage("fimk-sdk test")
       .sign(testnet.ASSET_2.ISSUER.SECRET_PHRASE)
       .then(transaction => transaction.broadcast())
     handleResult(promise, done)
@@ -129,14 +129,14 @@ describe("Transaction API", () => {
   // it("Atomic Multi Asset Transfer", done => {
   //   let promise = heatsdk
   //     .atomicMultiTransfer(testnet.ASSET_2.ISSUER.ID, testnet.ASSET_1.ID, "4")
-  //     .publicMessage("heat-sdk test")
+  //     .publicMessage("fimk-sdk test")
   //     .sign(testnet.ASSET_1.ISSUER.SECRET_PHRASE)
   //     .then(transaction => transaction.broadcast())
   //   handleResult(promise, done)
   //   //transfer back
   //   promise = heatsdk
   //     .assetTransfer(testnet.ASSET_1.ISSUER.ID, testnet.ASSET_1.ID, "4")
-  //     .publicMessage("heat-sdk test")
+  //     .publicMessage("fimk-sdk test")
   //     .sign(testnet.ASSET_2.ISSUER.SECRET_PHRASE)
   //     .then(transaction => transaction.broadcast())
   //   handleResult(promise, done)
@@ -145,12 +145,12 @@ describe("Transaction API", () => {
   it("place Ask Order", done => {
     let promise = heatsdk
       .placeAskOrder(testnet.ASSET_1.ID, testnet.ASSET_2.ID, "400000", "2000000", 3600)
-      .publicMessage("heat-sdk test")
+      .publicMessage("fimk-sdk test")
       .sign(testnet.ACCOUNT_2.SECRET_PHRASE)
       .then(transaction => transaction.broadcast())
     promise = heatsdk
       .placeAskOrder(testnet.ASSET_1.ID, testnet.ASSET_2.ID, "400000", "2000000", 3600)
-      .publicMessage("heat-sdk test")
+      .publicMessage("fimk-sdk test")
       .sign(testnet.ACCOUNT_2.SECRET_PHRASE)
       .then(transaction => transaction.broadcast())
     handleResult(promise, done)
@@ -159,7 +159,7 @@ describe("Transaction API", () => {
   it("place Bid Order", done => {
     let promise = heatsdk
       .placeBidOrder(testnet.ASSET_1.ID, testnet.ASSET_2.ID, "400000", "2000000", 3600)
-      .publicMessage("heat-sdk test")
+      .publicMessage("fimk-sdk test")
       .sign(testnet.ACCOUNT_1.SECRET_PHRASE)
       .then(transaction => transaction.broadcast())
     handleResult(promise, done)
@@ -176,7 +176,7 @@ describe("Transaction API", () => {
           if (account) {
             let promise = heatsdk
               .cancelAskOrder(orderData.order)
-              .publicMessage("heat-sdk test")
+              .publicMessage("fimk-sdk test")
               .sign(account.SECRET_PHRASE)
               .then(transaction => transaction.broadcast())
             handleResult(promise, done)
@@ -199,7 +199,7 @@ describe("Transaction API", () => {
           if (account) {
             let promise = heatsdk
               .cancelBidOrder(orderData.order)
-              .publicMessage("heat-sdk test")
+              .publicMessage("fimk-sdk test")
               .sign(account.SECRET_PHRASE)
               .then(transaction => transaction.broadcast())
             handleResult(promise, done)

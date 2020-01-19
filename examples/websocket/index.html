@@ -14,9 +14,9 @@
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>  
     <link rel="stylesheet" href="style.css"> 
     
-    <!-- Please note how we hardcode the use of heat-sdk version, 0.3.3 in this case -->
+    <!-- Please note how we hardcode the use of fimk-sdk version, 0.3.3 in this case -->
     
-    <script src="https://unpkg.com/heat-sdk@0.5.0/dist/heat-sdk.umd.min.js"></script>
+    <script src="https://unpkg.com/fimk-sdk@0.5.0/dist/fimk-sdk.umd.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
       function beep() {
@@ -25,7 +25,7 @@
       }
       beep();      
       $(document).ready(function () {
-        var sdk = new heatsdk.HeatSDK()
+        var sdk = new heatsdk.FimkSDK()
         var subs = {}
 
         function setup(id, name, subscription) {
@@ -50,7 +50,7 @@
         }
 
         // Note that all websocket subscriptions can be given filters that determine when they are 
-        // invoked, or not. Please see https://heat-ledger-ltd.github.io/heat-sdk/classes/_heat_subscriber_.heatsubscriber.html
+        // invoked, or not. Please see https://heat-ledger-ltd.github.io/fimk-sdk/classes/_heat_subscriber_.heatsubscriber.html
         // for details on the various subscriber filters.
         setup('block-pushed', 'block pushed', sdk.subscriber.blockPushed({}))
         setup('block-popped', 'block popped', sdk.subscriber.blockPopped({}))
@@ -72,7 +72,7 @@
   <body>
     <h3>HEAT-SDK | Websockets / push</h3>
     
-    <h6>With heat-sdk we can subscribe for realtime push messages for observing live blockchain events. Checkout the <a href="https://heat-ledger-ltd.github.io/heat-sdk/classes/_heat_subscriber_.heatsubscriber.html">sdk documentation</a> for further details.
+    <h6>With fimk-sdk we can subscribe for realtime push messages for observing live blockchain events. Checkout the <a href="https://heat-ledger-ltd.github.io/fimk-sdk/classes/_heat_subscriber_.heatsubscriber.html">sdk documentation</a> for further details.
     Note that these same samples will run in your browser, in your mobile phone and in your server side scripts.</h6>
     
     <h6>Expect blocks to arrive every 30 seconds, this means you'd have to wait at max 30 seconds to see the push messages coming in.</h6>

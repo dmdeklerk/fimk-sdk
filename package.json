@@ -1,11 +1,11 @@
 {
-  "name": "heat-sdk",
+  "name": "fimk-sdk",
   "version": "1.1.0",
-  "description": "HEAT support libraries for use in Node.js and any (modern) browser",
+  "description": "FIMK support libraries for use in Node.js and any (modern) browser",
   "keywords": [
-    "heat",
+    "fimk",
     "heatledger",
-    "heat-sdk",
+    "fimk-sdk",
     "blockchain",
     "websocket",
     "nodejs",
@@ -15,16 +15,16 @@
     "cryptography",
     "microservices"
   ],
-  "main": "./dist/heat-sdk",
-  "browser": "./dist/heat-sdk.umd.js",
-  "types": "./dist/heat-sdk.d.ts",
+  "main": "./dist/fimk-sdk",
+  "browser": "./dist/fimk-sdk.umd.js",
+  "types": "./dist/fimk-sdk.d.ts",
   "files": [
     "dist"
   ],
   "author": "Dennis de Klerk <dennis@heatledger.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Heat-Ledger-Ltd/heat-sdk"
+    "url": "https://github.com/dmdeklerk/fimk-sdk"
   },
   "license": "MIT",
   "engines": {
@@ -33,7 +33,7 @@
   "scripts": {
     "lint": "tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "rollup -c && rimraf compiled && typedoc --sourcefile-url-prefix 'https://github.com/Heat-Ledger-Ltd/heat-sdk/blob/master/src/' --out dist/docs --target es6 --theme minimal src",
+    "build": "rollup -c && rimraf compiled && typedoc --sourcefile-url-prefix 'https://github.com/dmdeklerk/fimk-sdk/blob/master/src/' --out dist/docs --target es6 --theme minimal src",
     "buildfast": "rimraf dist && rollup -c && rimraf compiled",
     "start": "rollup -c -w",
     "test": "jest --forceExit",

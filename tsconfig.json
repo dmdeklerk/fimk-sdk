@@ -34,11 +34,8 @@
     "src/fee.ts",
     "src/fimk-api.ts",
     "src/fimk-sdk.ts",
-    "src/fimk-rpc.ts",
-    "src/secret-generator.ts",
     "src/transaction-type.ts",
     "src/transaction.ts",
-    "src/types.ts",
     "src/utils.ts"
   ]
 }

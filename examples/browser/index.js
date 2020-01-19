@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  let sdk = new heatsdk.HeatSDK();
+  let sdk = new heatsdk.FimkSDK();
   getLastBlock(sdk)
   getLastTransactions(sdk)
   setupSecretGenerator(sdk)
@@ -99,7 +99,7 @@ function setupEncryptText(sdk) {
     }, 500)    
   }
   $('#5 #key').val(sdk.secretGenerator.generate())
-  $('#5 #plain').val("saving the world with heat-sdk")
+  $('#5 #plain').val("saving the world with fimk-sdk")
   encrypt()
   $('#5 #btn-encr').click(function (){ encrypt() })
   $('#5 #btn-decr').click(function (){ decrypt() })  

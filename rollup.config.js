@@ -11,9 +11,9 @@ import typescript from 'rollup-plugin-typescript2'
 import alias from 'rollup-plugin-alias'
 
 const path = require('path')
-const libraryName = "heat-sdk"
+const libraryName = "fimk-sdk"
 export default [
-  { // heat-sdk.js | NodeJS CommonJS module
+  { // fimk-sdk.js | NodeJS CommonJS module
     input: `src/${libraryName}.ts`,
     plugins: [
       typescript({ typescript: require("typescript") }),
@@ -29,10 +29,10 @@ export default [
     sourcemap: true,
     external: 'buffer,memcpy,url,http,https,zlib,stream,util,events,crypto,fs,path'.split(','),
     output: [
-			{ file: 'dist/heat-sdk.js', format: 'cjs' }
+			{ file: 'dist/fimk-sdk.js', format: 'cjs' }
     ]
   },
-  { // heat-sdk.umd.js | Browser UMD module
+  { // fimk-sdk.umd.js | Browser UMD module
     input: `src/${libraryName}.ts`,
     plugins: [
       alias({
@@ -58,11 +58,11 @@ export default [
       sourceMaps()      
     ],
     output: [
-			{ file: 'dist/heat-sdk.umd.js', format: 'umd', name: 'heatsdk' }
+			{ file: 'dist/fimk-sdk.umd.js', format: 'umd', name: 'heatsdk' }
     ],
     external: ['utf-8-validate','bufferutil']
   },
-  { // heat-sdk.umd.min.js | Minified Browser UMD module
+  { // fimk-sdk.umd.min.js | Minified Browser UMD module
     input: `src/${libraryName}.ts`,
     plugins: [
       alias({
@@ -90,7 +90,7 @@ export default [
     ],
     sourcemap: true,
     output: [
-			{ file: 'dist/heat-sdk.umd.min.js', format: 'umd', name: 'heatsdk' }
+			{ file: 'dist/fimk-sdk.umd.min.js', format: 'umd', name: 'heatsdk' }
     ]
   }  
 ]

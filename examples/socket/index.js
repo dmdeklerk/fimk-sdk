@@ -2,7 +2,7 @@ const config = new heatsdk.Configuration({
   isTestnet: true, 
   baseURL: "http://localhost:7733/api/v1", websocketURL: "ws://localhost:7755/ws/"
 })
-const sdk = new heatsdk.HeatSDK(config)
+const sdk = new heatsdk.FimkSDK(config)
 var model = null
 
 function initDemo() {
